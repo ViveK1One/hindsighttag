@@ -7,7 +7,7 @@ harder benchmark scenarios, and hyperparameter studies — including negative re
 ## Setting up
 
 ```bash
-git clone https://github.com/vivekdudhat/hindsighttag.git
+git clone https://github.com/ViveK1One/hindsighttag.git
 cd hindsighttag
 pip install -e ".[all,dev]"
 pytest tests/ -q

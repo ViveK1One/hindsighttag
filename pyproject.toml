@@ -65,10 +65,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/vivekdudhat/hindsighttag"
-Repository = "https://github.com/vivekdudhat/hindsighttag"
-Paper = "https://github.com/vivekdudhat/hindsighttag#citation"
-Issues = "https://github.com/vivekdudhat/hindsighttag/issues"
+Homepage = "https://github.com/ViveK1One/hindsighttag"
+Repository = "https://github.com/ViveK1One/hindsighttag"
+Paper = "https://github.com/ViveK1One/hindsighttag#citation"
+Issues = "https://github.com/ViveK1One/hindsighttag/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

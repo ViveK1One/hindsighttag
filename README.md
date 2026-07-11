@@ -67,7 +67,7 @@ pip install "hindsighttag[benchmark]"    # run the Hindsight Rescue Benchmark
 From source (recommended for development and reproducing the benchmark):
 
 ```bash
-git clone https://github.com/vivekdudhat/hindsighttag.git
+git clone https://github.com/ViveK1One/hindsighttag.git
 cd hindsighttag
 pip install -e ".[all,dev]"
 ```
@@ -386,7 +386,7 @@ Please open an issue or PR with questions, new adapters, or benchmark extensions
              Retroactive Memory Consolidation in LLM Agents},
   author  = {Dudhat, Vivek Govindbhai},
   year    = {2026},
-  note    = {Preprint. Code: https://github.com/vivekdudhat/hindsighttag}
+  note    = {Preprint. Code: https://github.com/ViveK1One/hindsighttag}
 }
 ```
 
@@ -403,7 +403,7 @@ New host-system adapters are the most valuable contribution. See
 
 ## Contact
 
-Questions or issues? [Open a GitHub issue](https://github.com/vivekdudhat/hindsighttag/issues) or email [vivekdudhat369@gmail.com](mailto:vivekdudhat369@gmail.com).
+Questions or issues? [Open a GitHub issue](https://github.com/ViveK1One/hindsighttag/issues) or email [vivekdudhat369@gmail.com](mailto:vivekdudhat369@gmail.com).
 
 ---
 
