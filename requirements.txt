@@ -1,0 +1,3 @@
+# Core install (mirrors pyproject.toml dependencies).
+# For optional extras: pip install -e ".[all,dev]" or see README.
+numpy>=1.24

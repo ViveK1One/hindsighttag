@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hindsighttag"
+version = "0.1.0"
+description = "A synaptic tagging-and-capture memory plug-in for retroactive memory consolidation in LLM agents."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Vivek Govindbhai Dudhat", email = "vivekdudhat369@gmail.com" },
+]
+keywords = [
+    "llm-agent-memory",
+    "synaptic-tagging-and-capture",
+    "behavioral-tagging",
+    "memory-consolidation",
+    "retroactive-salience",
+    "engram-allocation",
+    "neuroscience-grounded-ai",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+embeddings = [
+    "sentence-transformers>=2.2.0",
+    "scikit-learn>=1.3.0",
+]
+mem0 = [
+    "mem0ai>=2.0.0",
+]
+benchmark = [
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "matplotlib>=3.7",
+    "sentence-transformers>=2.2.0",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+]
+all = [
+    "sentence-transformers>=2.2.0",
+    "scikit-learn>=1.3.0",
+    "mem0ai>=2.0.0",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "matplotlib>=3.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/vivekdudhat/hindsighttag"
+Repository = "https://github.com/vivekdudhat/hindsighttag"
+Paper = "https://github.com/vivekdudhat/hindsighttag#citation"
+Issues = "https://github.com/vivekdudhat/hindsighttag/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hindsighttag = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"

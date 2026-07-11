@@ -1,0 +1,17 @@
+comparison_group,method,metric,point_estimate,ci_lower,ci_upper,n_runs
+primary_omega0,mem0,rescue_recall,0.0,0.0,0.0,15
+primary_omega0,mem0,false_rescue_rate,0.0,0.0,0.0,15
+primary_omega0,mem0,retention_lift,0.0,0.0,0.0,15
+primary_omega0,mem0,coallocation_recall_at_k,,,,0
+primary_omega0,vector_store,rescue_recall,0.7166666666666667,0.65,0.7666666666666667,15
+primary_omega0,vector_store,false_rescue_rate,0.8,0.725,0.875,15
+primary_omega0,vector_store,retention_lift,-0.08333333333333333,-0.175,0.0,15
+primary_omega0,vector_store,coallocation_recall_at_k,,,,0
+primary_omega0,mem0+HindsightTag,rescue_recall,0.23333333333333334,0.2,0.26666666666666666,15
+primary_omega0,mem0+HindsightTag,false_rescue_rate,0.0,0.0,0.0,15
+primary_omega0,mem0+HindsightTag,retention_lift,0.23333333333333334,0.2,0.26666666666666666,15
+primary_omega0,mem0+HindsightTag,coallocation_recall_at_k,1.0,1.0,1.0,15
+primary_omega0,vector_store+HindsightTag,rescue_recall,0.7166666666666667,0.65,0.7666666666666667,15
+primary_omega0,vector_store+HindsightTag,false_rescue_rate,0.8,0.725,0.875,15
+primary_omega0,vector_store+HindsightTag,retention_lift,-0.08333333333333333,-0.175,0.0,15
+primary_omega0,vector_store+HindsightTag,coallocation_recall_at_k,1.0,1.0,1.0,15

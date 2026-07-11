@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Datasets
+data/locomo/
+data/longmemeval/
+
+# Generated benchmark outputs
+benchmark/results/run_meta_*.json
+benchmark/results/manifest_*.json
+benchmark/results/run_log*.txt
+benchmark/results/run_ablation_log*.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local output directory
+/results/
