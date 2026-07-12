@@ -172,79 +172,141 @@ These are **literature-informed calibration seeds, not validated defaults** (pap
 
 The [Hindsight Rescue Benchmark](benchmark/) (HRB, paper §5) plants four categories of
 scenario — (a) rescued precursor, (b) heterosynaptic control, (c) negative/no-trigger,
-(d) negative/no-precursor — into the **real, public [LoCoMo](https://github.com/snap-research/locomo)
-conversation stream** at controlled delays (1 hour / 1 day / 1 week / 1 month), then
-measures four metrics against the host system with and without HindsightTag.
+(d) negative/no-precursor — into **two real, public conversation streams**
+([LoCoMo](https://github.com/snap-research/locomo) and
+[LongMemEval](https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned)) at
+controlled delays (1 hour / 1 day / 1 week / 1 month), then measures four metrics
+against the host system with and without HindsightTag.
 
-**These are real measured numbers** (3 conversations × 5 seeds, `omega_assoc=0`,
-bootstrap 95% CIs). Reproduce with the commands below.
+**These are real measured numbers**: **20 conversations (10 LoCoMo + 10 LongMemEval)
+× 10 seeds = 200 runs per method**, `omega_assoc=0`, bootstrap 95% CIs. Reproduce with
+the commands below.
+
+**Window settings for this run** (the shipped calibration seeds, logged per row):
+`T_tag = 6 h`, `W_capture = 35 days` (3,024,000 s), `E_window = 4 h` (14,400 s),
+`theta_capture = 0.7`, `theta_rescue = 0.10`. The four planted delays are 1 hour, 1 day,
+1 week, and 1 month (30 days).
 
 ![HRB results](benchmark/results/hrb_results_figure.png)
 
+**Aggregate (all four delays pooled):**
+
 | Method | Rescue Recall ↑ | False Rescue Rate ↓ | Retention Lift ↑ | Co-Alloc Recall@k ↑ |
 |---|---|---|---|---|
-| Mem0 (baseline) | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] | N/A |
-| **Mem0 + HindsightTag** | **0.23 [0.20, 0.27]** | **0.00 [0.00, 0.00]** | **0.23 [0.20, 0.27]** | **1.00 [1.00, 1.00]** |
-| Vector Store (baseline) | 0.72 [0.65, 0.77] | 0.80 [0.73, 0.88] | −0.08 [−0.18, 0.00] | N/A |
-| Vector Store + HindsightTag | 0.72 [0.65, 0.77] | 0.80 [0.73, 0.88] | −0.08 [−0.18, 0.00] | 1.00 [1.00, 1.00] |
+| Mem0 (baseline) | 0.01 [0.01, 0.02] | 0.01 [0.00, 0.01] | 0.00 [−0.00, 0.01] | N/A |
+| **Mem0 + HindsightTag** | **0.06 [0.05, 0.07]** | 0.02 [0.01, 0.03] | **0.04 [0.03, 0.05]** | **0.15 [0.13, 0.16]** |
+| Vector Store (baseline) | 0.71 [0.68, 0.73] | 0.78 [0.76, 0.80] | −0.07 [−0.11, −0.04] | N/A |
+| Vector Store + HindsightTag | 0.71 [0.68, 0.73] | 0.78 [0.76, 0.80] | −0.07 [−0.11, −0.04] | 0.15 [0.13, 0.16] |
 
-**Honest reading of these results:**
+> The Vector Store's **0.78 False Rescue Rate is its own undecaying retention floor, not erroneous HindsightTag rescues**: nothing decays on this host, so there is nothing for HindsightTag to falsely rescue from — its attributable contribution is **0.00** (see the captioned panel in the figure).
 
-- On a **decay-based host (Mem0-style)** — the intended target — HindsightTag lifts
-  Rescue Recall from **0% → 23%** with a **0% false-rescue rate**, and delivers
-  temporal co-allocation retrieval that the baseline structurally cannot provide (N/A).
-- The **23% is modest and delay-dependent**: with `T_tag ≈ 6 h`, rescues largely
-  succeed at the **1-hour** delay and mostly fail at 1 day / 1 week / 1 month, because
-  tags decay before the trigger arrives. This is consistent with the biology but caps
-  aggregate recall.
-- On a **non-forgetting vector store**, there is nothing to rescue: the baseline already
-  retains everything (72% "recall"), HindsightTag adds **no lift**, and the store shows a
-  **high 80% false-rescue rate** because low-salience items never decay out. This is an
-  important *negative* result, reported as-is.
-- Full hyperparameter sweep (87 configs × 5 seeds × 3 conversations) is in
-  `benchmark/results/hrb_results_20260711_105013.csv`; many aggressive settings yield 0%
-  rescue.
+**Contribution attributable to HindsightTag** (WITH − baseline, paired on stream ×
+conversation × seed — isolates the mechanism from host-intrinsic behaviour):
+
+| Host | Δ Rescue Recall | Δ False Rescue Rate | Δ Retention Lift |
+|---|---|---|---|
+| Mem0 | **+0.05 [0.04, 0.06]** | +0.016 [0.008, 0.024] | +0.04 [0.02, 0.05] |
+| Vector Store | **0.00 [0.00, 0.00]** | **0.00 [0.00, 0.00]** | 0.00 [0.00, 0.00] |
+
+**Rescue Recall stratified by delay** (Mem0 + HindsightTag, and Mem0-attributable):
+
+| Delay | Mem0 + HT | Attributable (HT − baseline) |
+|---|---|---|
+| **1 hour** | **0.18 [0.14, 0.22]** | **+0.16 [0.13, 0.19]** |
+| 1 day | 0.03 [0.02, 0.05] | +0.02 [0.01, 0.04] |
+| 1 week | 0.02 [0.01, 0.04] | +0.01 [−0.01, 0.03] |
+| 1 month | 0.02 [0.01, 0.04] | +0.02 [0.01, 0.04] |
+
+**Co-Alloc Recall@k stratified by delay** (corrected, non-circular ground truth):
+
+| Delay | Recall@k | Note |
+|---|---|---|
+| **1 hour** | **0.59 [0.53, 0.65]** | LoCoMo 0.998 vs LongMemEval 0.19 — dense streams create real top-k competition |
+| 1 day / 1 week / 1 month | 0.00 | out of `E_window` (~4 h) → no edge → genuine miss |
+
+**Honest reading of these results (corrected pass):**
+
+- **Co-Alloc Recall@k was previously a tautology.** The old metric defined ground truth
+  as "any pair within `E_window`" — exactly the condition under which Eq. 6 always
+  creates an edge — so it was pinned at **1.00** by construction. With an *independent*,
+  scenario-defined ground truth (a precursor's true partner is its own trigger, scored at
+  **all** delays and against the full pool of temporally-registered memories), it drops to
+  **0.15 aggregate**. Even at 1 hour it is **0.59**, not 1.00, because on the denser
+  LongMemEval stream (0.19) the true trigger is often outranked in the top-k. It is
+  **0.00 at every delay beyond `E_window`** — those pairs get no edge at all.
+- **The rescue effect is real but small, and almost entirely a 1-hour phenomenon.**
+  On Mem0, HindsightTag's *attributable* Rescue Recall is **+0.16 at 1 hour** but only
+  **+0.01–0.02** at 1 day / 1 week / 1 month — with `T_tag ≈ 6 h` the tag decays before
+  later triggers arrive. The blended **+0.05** aggregate is therefore carried by the
+  1-hour bucket, confirming the concern that a single blended number is misleading. (The
+  earlier "0.23" was a LoCoMo-only, 3-conversation, non-deterministic-seed pilot; the
+  larger, deterministic, two-stream sample lands lower.)
+- **Window causality — by construction vs. emergent.** The two drop-offs beyond 1 hour
+  have different causes: the **Co-Alloc Recall@k collapse to 0.00 at 1 day / 1 week /
+  1 month is a direct, by-construction consequence of `E_window = 4 h`** (those pairs are
+  separated by more than 4 h, so Eq. 6 creates no edge at all — definitional, not an
+  emergent finding), whereas the **Rescue Recall decline is *not* a windowing artifact**:
+  all four delays (up to 30 days) fall inside `W_capture = 35 days`, so the precursors
+  remain within the capture window, and the decline is an emergent consequence of the
+  `T_tag = 6 h` tag decay driving capture strength below `theta_rescue`, not of the window
+  bounds.
+- **On the non-forgetting vector store, HindsightTag contributes exactly nothing.** Its
+  0.78 false-rescue rate and 0.71 "recall" are **100% host-intrinsic** — the attributable
+  columns are **0.00** across the board. The old table showed "0.80 / 0.80" for baseline
+  and +HT, which invited the reader to credit HindsightTag with behaviour that is purely
+  the store's own non-decay. The attributable view makes this explicit.
+- **HindsightTag is not free of false rescues on Mem0.** It adds a small but nonzero
+  **+0.016** false-rescue rate (old table reported 0.00). Small, but reported as-is.
+- **The story changed from the first pass**, and the corrected numbers are weaker: Co-Alloc
+  fell 1.00 → 0.15, headline Rescue Recall fell 0.23 → 0.06 (0.18 at 1 hour), and the
+  vector-store "lift" is confirmed to be zero contribution. These are the numbers that
+  should go in the paper.
 
 ### Reproduce
 
 ```bash
 python benchmark/download_data.py                       # fetch LoCoMo
-python benchmark/run_hrb.py --seeds 0 1 2 3 4 --conversations 3
+python benchmark/download_longmemeval.py                # fetch LongMemEval (optional 2nd stream)
+python benchmark/run_hrb.py --streams locomo longmemeval --full-locomo --conversations 10 \
+    --seeds 0 1 2 3 4 5 6 7 8 9 --configs primary
 python benchmark/plot_results.py benchmark/results/hrb_summary_<timestamp>.csv
-python benchmark/run_hrb.py --full-ablation             # full sweep (slower)
+python benchmark/run_hrb.py --full-ablation             # full hyperparameter sweep (slow)
 ```
 
-Every run logs all six hyperparameters per row and reports paired bootstrap CIs.
+Every run logs all six hyperparameters per row, emits per-delay breakdowns and a
+paired `hrb_attributable_<ts>.csv`, and reports bootstrap CIs.
 
-### Benchmark runtime (why it can feel slow)
+### Benchmark runtime
 
-HRB is **not** a quick unit test. Each run **replays an entire conversation** through the memory system and runs embedding-based retrieval for every planted scenario. On a typical laptop CPU:
+Each run **replays an entire conversation** through the memory system and runs
+embedding-based retrieval for every planted scenario. Rough guidance (first run also
+downloads the `all-MiniLM-L6-v2` embedding model, ~90 MB):
 
-| Command | Full replays | Rough time |
+| Command | Runs (host × config) | Rough time |
 |---|---|---|
-| `--seeds 0 --conversations 1 --scenarios-per-category 1` | 12 | ~2–5 min |
-| Default: `--seeds 0 1 2 3 4 --conversations 3` | 180 | ~20–60 min |
-| `--full-ablation` | ~2,640 | **hours** |
-
-**Why:** default settings = 3 conversations × 5 seeds × 2 hosts × 6 configs (1 baseline + 5 `omega_assoc` values) = **180 independent simulations**. The first run also downloads the `all-MiniLM-L6-v2` embedding model from Hugging Face (~90 MB).
+| `--seeds 0 --conversations 1 --scenarios-per-category 1 --configs primary` | ~4 | seconds |
+| Headline: 20 convs × 10 seeds × 2 hosts × 2 configs | 800 | ~2–4 min |
+| `--configs omega` (5 ω values) | 5× the above | minutes |
+| `--full-ablation` | ~87 configs | **much longer** |
 
 **Quick smoke test** (recommended while developing):
 
 ```bash
-python benchmark/run_hrb.py --seeds 0 --conversations 1 --scenarios-per-category 1
+python benchmark/run_hrb.py --seeds 0 --conversations 1 --scenarios-per-category 1 --configs primary
 ```
 
-**Using HindsightTag in your own app** (`examples/quickstart.py`) takes seconds — slowness applies only to the full HRB evaluation harness.
+**Using HindsightTag in your own app** (`examples/quickstart.py`) takes seconds — the
+cost is only in the full HRB evaluation harness.
 
 ### Debugging note
 
 - **LoCoMo missing?** Run `python benchmark/download_data.py` first — data lands in `data/locomo/` (gitignored).
-- **Smoke test while developing:** `--seeds 0 --conversations 1 --scenarios-per-category 1` (~12 replays).
-- **Re-running HRB?** New runs write timestamped files; committed reference results in `benchmark/results/hrb_*_20260711_105058.*` are the paper numbers — you do not need to re-run to use the repo.
+- **LongMemEval missing?** Run `python benchmark/download_longmemeval.py` (fetches the smaller `oracle` split by default; gitignored).
+- **Re-running HRB?** New runs write timestamped files; committed reference results in `benchmark/results/hrb_*_20260712_090343.*` are the current paper numbers — you do not need to re-run to use the repo.
 - **Regenerate figures:**
   ```bash
   python docs/make_figure1.py
-  python benchmark/plot_results.py benchmark/results/hrb_summary_20260711_105058.csv
+  python benchmark/plot_results.py benchmark/results/hrb_summary_20260712_090343.csv
   ```
 
 > **Dataset license:** LoCoMo is used under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) (non-commercial, with attribution). It is **not** bundled in this repository — see [Data & third-party attribution](#data--third-party-attribution).
@@ -279,6 +341,26 @@ HRB **planted scenarios** (precursor/trigger templates in `benchmark/hrb/dataset
 
 **Commercial use:** CC BY-NC 4.0 prohibits using LoCoMo in commercial products without separate permission from the dataset authors (Snap Research). Academic research, open-source repos, and papers are fine with attribution.
 
+### LongMemEval (HRB second base conversation stream)
+
+| | |
+|---|---|
+| **What we use** | Session turns (default: the smaller `oracle` split) as chronological filler in HRB — no QA questions/answers or needle labels |
+| **Source** | [xiaowu0162/longmemeval-cleaned](https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned) (Wu et al., 2024/2025) |
+| **License** | MIT (per the Hugging Face dataset card) |
+| **Bundled in repo?** | **No** — `data/longmemeval/` is gitignored; users fetch via `python benchmark/download_longmemeval.py` |
+| **What we publish** | Aggregated benchmark metrics only — no LongMemEval conversation text |
+
+```bibtex
+@article{wu2024longmemeval,
+  title   = {LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory},
+  author  = {Wu, Di and Wang, Hongwei and Yu, Wenhao and Zhang, Yuwei and
+             Chang, Kai-Wei and Yu, Dong},
+  journal = {arXiv preprint arXiv:2410.10813},
+  year    = {2024}
+}
+```
+
 ### Embedding model (optional `[embeddings]` extra)
 
 | | |
@@ -299,14 +381,14 @@ HRB **planted scenarios** (precursor/trigger templates in `benchmark/hrb/dataset
 
 ### Other referenced systems (not bundled)
 
-ZenBrain, FadeMem, FSFM, HippoRAG, and LongMemEval are cited in the paper as related work or future benchmark options. **None of their code or data is included** in this repository.
+ZenBrain, FadeMem, FSFM, and HippoRAG are cited in the paper as related work. **None of their code or data is included** in this repository.
 
 ### Privacy & redistribution checklist
 
 | Item | Status |
 |---|---|
-| LoCoMo raw data in GitHub upload | Blocked by `.gitignore` |
-| LoCoMo text in benchmark result files | Not present (metrics only) |
+| LoCoMo / LongMemEval raw data in GitHub upload | Blocked by `.gitignore` |
+| Dataset text in benchmark result files | Not present (metrics only) |
 | Local PC paths in committed files | Removed; `run_meta_*.json` gitignored |
 | API keys / `.env` files | None in repository |
 
@@ -322,11 +404,15 @@ Matching the paper's own Limitations section:
    seeds. Poor settings produce either negligible rescue or excessive false rescues.
 3. **Rescue quality is bounded by the host's salience function.** HindsightTag adds a
    temporal mechanism; it does not improve what the host considers salient.
-4. **Benchmark simplifications.** LoCoMo filler turns are subsampled for runtime
-   (planted scenarios are always kept); the Mem0 adapter runs Mem0's decay/gating
+4. **Benchmark simplifications.** LoCoMo/LongMemEval filler turns are subsampled for
+   runtime (planted scenarios are always kept); the Mem0 adapter runs Mem0's decay/gating
    semantics deterministically offline rather than a live per-turn LLM extraction loop.
    `Mem0Host(use_live_mem0=True)` enables the live index when `mem0ai` is installed.
-5. **Single-agent setting only.** Multi-agent/shared-store rescue and its privacy
+5. **The effect is small and 1-hour-dominated.** With `T_tag ≈ 6 h`, the attributable
+   Rescue Recall lift is meaningful only at the 1-hour delay (+0.16) and negligible
+   beyond; Co-Alloc Recall@k is 0 outside `E_window`. The headline aggregates are modest
+   by construction — see "Honest reading of these results" above.
+6. **Single-agent setting only.** Multi-agent/shared-store rescue and its privacy
    implications are out of scope.
 
 Contributions that stress-test, refute, or improve these results are explicitly welcome.
@@ -349,8 +435,9 @@ Contributions that stress-test, refute, or improve these results are explicitly 
 ├── 📂 benchmark/                  # Hindsight Rescue Benchmark (HRB, paper §5)
 │   ├── run_hrb.py                 # Main reproduction entry point
 │   ├── download_data.py           # Fetch LoCoMo (not bundled)
-│   ├── plot_results.py            # Regenerate benchmark figure
-│   ├── 📂 hrb/                    # Dataset planting, replay, metrics
+│   ├── download_longmemeval.py    # Fetch LongMemEval second stream (not bundled)
+│   ├── plot_results.py            # Regenerate benchmark figure (delay-stratified)
+│   ├── 📂 hrb/                    # Dataset planting, replay, metrics, LongMemEval loader
 │   └── 📂 results/                # Committed reference metrics + figure
 ├── 📂 examples/
 │   └── quickstart.py              # Minimal attach-and-rescue demo
@@ -370,7 +457,7 @@ Contributions that stress-test, refute, or improve these results are explicitly 
 
 - [ ] PyPI release (`pip install hindsighttag` from PyPI)
 - [ ] arXiv preprint link
-- [ ] LongMemEval as a second HRB base stream
+- [x] LongMemEval as a second HRB base stream
 - [ ] More host adapters (FadeMem, ZenBrain, custom agent memory)
 - [ ] Hyperparameter auto-tuning from delay distribution
 

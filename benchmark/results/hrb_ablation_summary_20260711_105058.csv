@@ -1,9 +1,0 @@
-comparison_group,method,metric,point_estimate,ci_lower,ci_upper,n_runs
-full_ablation,mem0+HindsightTag,rescue_recall,0.22333333333333333,0.21,0.235,75
-full_ablation,mem0+HindsightTag,false_rescue_rate,0.0,0.0,0.0,75
-full_ablation,mem0+HindsightTag,retention_lift,0.22333333333333333,0.21,0.235,75
-full_ablation,mem0+HindsightTag,coallocation_recall_at_k,1.0,1.0,1.0,75
-full_ablation,vector_store+HindsightTag,rescue_recall,0.7166666666666667,0.69,0.7433333333333333,75
-full_ablation,vector_store+HindsightTag,false_rescue_rate,0.8,0.7666250000000001,0.8333333333333334,75
-full_ablation,vector_store+HindsightTag,retention_lift,-0.08333333333333333,-0.12337499999999997,-0.041666666666666664,75
-full_ablation,vector_store+HindsightTag,coallocation_recall_at_k,1.0,1.0,1.0,75
